@@ -2,13 +2,15 @@ class CheckboxesPage {
   get elements() {
     return {
       header: () => $("h3"),
-      checkbox: (num) => $(`input:nth-child(${num})`),
+      checkbox: (num) => $$('input[type="checkbox"]')[num - 1],
     };
   }
 
   async select(num) {
     const checkbox = await this.elements.checkbox(num);
-    await checkbox.click();
+    if (!(await checkbox.isSelected())) {
+      await checkbox.click();
+    }
   }
 }
 

@@ -1,0 +1,44 @@
+name: WDIO Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  wdio-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers (required by some environments)
+        run: npx playwright install --with-deps
+
+      - name: Run WDIO tests with sharding
+        run: |
+          npx wdio run ./wdio.conf.js \
+          --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      - name: Upload WDIO report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wdio-report-${{ matrix.shardIndex }}
+          path: ./reports
