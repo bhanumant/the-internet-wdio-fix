@@ -1,17 +1,12 @@
 import { browser } from "@wdio/globals";
 
-/**
- * main page object containing all methods, selectors and functionality
- * that is shared across all page objects
- */
 export default class Page {
   get paths() {
     return {
       "Basic Auth": "basic_auth",
       Checkboxes: "checkboxes",
       Dropdown: "dropdown",
-      inputs: "inputs",
-
+      Inputs: "inputs",
       "A/B Testing": "abtest",
       "Add/Remove Elements": "add_remove_elements/",
       "Broken Images": "broken_images",
@@ -56,20 +51,19 @@ export default class Page {
   }
 
   get base() {
-    return `https://the-internet.herokuapp.com`;
+    return "https://the-internet.herokuapp.com/";
   }
 
   async click(name) {
-    const anchor = await $(`a[href="/${this.paths[name]}"]`);
-    await anchor.click();
+    const link = await $(`=${name}`);
+    await link.waitForClickable();
+    await link.click();
   }
 
-  /**
-   * Opens a sub page of the page
-   * @param path path of the sub page (e.g. /path/to/page.html)
-   */
   open(path = "") {
-    if (path in this.paths) return this.open(this.paths[path]);
-    return browser.url(`${this.base}/${path}`);
+    if (path in this.paths) {
+      return browser.url(`${this.base}${this.paths[path]}`);
+    }
+    return browser.url(`${this.base}${path}`);
   }
 }
